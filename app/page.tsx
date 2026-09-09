@@ -2,128 +2,152 @@
 
 import { useRef, useState } from "react";
 
-const videos = [
+const groups = [
   {
-    title: "Багц сет хэрэглэх заавар",
-    description: "Багцын бүтээгдэхүүнүүдийг хэрхэн зөв дарааллаар хэрэглэх",
-    src: "/video.mp4",
+    title: "Хэрхэн Багц сетийг зөв хэрэглэх вэ ? ",
+    items: [
+      {
+        title: "Эхний 7 хоног хэрэглэх заавар",
+        src: "/video1.mp4",
+      },
+      {
+        title: "8 дахь хоногоос хэрэглэх заавар",
+        src: "/video2.mp4",
+      },
+    ],
   },
   {
-    title: "Тос түрхэх заавар",
-    description: "Тосыг хэрхэн зөв түрхэж хэрэглэх",
-    src: "/video2.mp4",
-  },
-  {
-    title: "Нэмэлт заавар",
-    description: "Нэмэлт мэдээлэл болон хэрэглэх зөвлөмж",
-    src: "/video3.mp4",
+    title: "Тосыг хэрхэн зөв хэрэглэх вэ ?",
+    items: [
+      {
+        title: "Алтан тос түрхэх заавар",
+        src: "/video3.mp4",
+      },
+      {
+        title: "Улаан тос түрхэх заавар",
+        src: "/video4.mp4",
+      },
+    ],
   },
 ];
 
+type VideoItem = {
+  title: string;
+  src: string;
+};
+
 export default function HomePage() {
-  const [active, setActive] = useState(0);
-  const [open, setOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<number | null>(null);
+  const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const selectVideo = (index: number) => {
-    setActive(index);
-    setOpen(false);
+  const selectVideo = (item: VideoItem) => {
+    setActiveVideo(item);
+    setOpenGroup(null);
 
-    const video = videoRef.current;
+    setTimeout(() => {
+      const video = videoRef.current;
 
-    if (!video) return;
+      if (!video) return;
 
-    video.pause();
-    video.src = videos[index].src;
-    video.load();
-
-    video.muted = false;
-    video.defaultMuted = false;
-    video.volume = 1;
+      video.muted = false;
+      video.defaultMuted = false;
+      video.volume = 1;
+    }, 0);
   };
 
   return (
     <main className="app-shell">
       <section className="choice-panel">
         <header className="page-header">
+          <span className="eyebrow">ХЭРЭГЛЭХ ЗААВАР</span>
+
           <h1>Шодой томруулах багц</h1>
 
-          <p>Доорх заавраас сонгоод бичлэгийг үзнэ үү</p>
+          <p>Доорх хэсгээс хэрэгтэй заавраа сонгоно уу</p>
         </header>
 
-        <div className="select-label">Заавар сонгох</div>
+        <div className="instruction-groups">
+          {groups.map((group, groupIndex) => {
+            const isOpen = openGroup === groupIndex;
 
-        <div className="dropdown">
-          <button
-            type="button"
-            className={`dropdown-button ${open ? "open" : ""}`}
-            onClick={() => setOpen(!open)}
-            aria-expanded={open}
-          >
-            <div className="selected-content">
-              <span className="selected-number">{active + 1}</span>
-
-              <div>
-                <span className="selected-title">{videos[active].title}</span>
-
-                <span className="selected-description">
-                  {videos[active].description}
-                </span>
-              </div>
-            </div>
-
-            <span className={`dropdown-arrow ${open ? "rotate" : ""}`}>▼</span>
-          </button>
-
-          {open && (
-            <div className="dropdown-menu">
-              {videos.map((video, index) => (
+            return (
+              <div
+                key={group.title}
+                className={`instruction-group ${isOpen ? "open" : ""}`}
+              >
                 <button
-                  key={index}
                   type="button"
-                  className={`dropdown-item ${
-                    active === index ? "active" : ""
-                  }`}
-                  onClick={() => selectVideo(index)}
+                  className="group-button"
+                  onClick={() => setOpenGroup(isOpen ? null : groupIndex)}
                 >
-                  <span className="item-number">{index + 1}</span>
+                  <div className="group-left">
+                    <span className="group-index">{groupIndex + 1}</span>
 
-                  <div className="item-info">
-                    <span className="item-title">{video.title}</span>
-
-                    <span className="item-description">
-                      {video.description}
-                    </span>
+                    <div>
+                      <strong>{group.title}</strong>
+                    </div>
                   </div>
 
-                  {active === index && <span className="check">✓</span>}
+                  <span className={`chevron ${isOpen ? "rotate" : ""}`}>⌄</span>
                 </button>
-              ))}
+
+                {isOpen && (
+                  <div className="group-menu">
+                    {group.items.map((item, index) => (
+                      <button
+                        type="button"
+                        key={item.src}
+                        className={`instruction-item ${
+                          activeVideo?.src === item.src ? "active" : ""
+                        }`}
+                        onClick={() => selectVideo(item)}
+                      >
+                        <span className="item-number">{index + 1}</span>
+
+                        <span className="item-title">{item.title}</span>
+
+                        <span className="play-icon">▶</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {!activeVideo && (
+          <div className="empty-state">
+            <div className="empty-icon">▶</div>
+
+            <strong>Бичлэг сонгоогүй байна</strong>
+
+            <span>Дээрх зааврын хэсгээс бичлэгээ сонгоно уу</span>
+          </div>
+        )}
+
+        {activeVideo && (
+          <section className="video-section">
+            <div className="video-heading">
+              <span>Сонгосон заавар</span>
+              <h2>{activeVideo.title}</h2>
             </div>
-          )}
-        </div>
 
-        <div className="now-watching">
-          <span>Одоо үзэж буй заавар</span>
-
-          <strong>{videos[active].title}</strong>
-        </div>
-
-        <section className="video-wrap">
-          <video
-            ref={videoRef}
-            key={videos[active].src}
-            className="video-frame"
-            src={videos[active].src}
-            controls
-            playsInline
-            preload="metadata"
-            muted={false}
-          />
-        </section>
-
-        <p className="video-help">▶ Бичлэг дээр дарж тоглуулна уу</p>
+            <div className="video-wrap">
+              <video
+                ref={videoRef}
+                key={activeVideo.src}
+                className="video-frame"
+                src={activeVideo.src}
+                controls
+                playsInline
+                preload="metadata"
+              />
+            </div>
+          </section>
+        )}
       </section>
     </main>
   );
