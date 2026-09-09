@@ -25,21 +25,6 @@ body {
   margin-bottom: 32px;
 }
 
-.header-badge {
-  display: inline-block;
-  padding: 7px 13px;
-  margin-bottom: 12px;
-
-  border-radius: 999px;
-
-  background: #111;
-  color: white;
-
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
 .page-header h1 {
   margin: 0;
   color: #111;

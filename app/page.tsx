@@ -47,8 +47,6 @@ export default function HomePage() {
     <main className="app-shell">
       <section className="choice-panel">
         <header className="page-header">
-          <div className="header-badge">ХЭРЭГЛЭХ ЗААВАР</div>
-
           <h1>Шодой томруулах багц</h1>
 
           <p>Доорх заавраас сонгоод бичлэгийг үзнэ үү</p>
